@@ -25,16 +25,14 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+/* USER CODE BEGIN Includes */     
 #include "generator.h"
 #include "status.h"
-#include "NCP5623.h"
-// #include "IIC.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-// extern I2C_HandleTypeDef hi2c1;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -50,13 +48,12 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 extern uint8_t canRxData[2048];
-osThreadId ledTaskHandle;
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
-
+osThreadId canTaskHandle;
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-void LED_task(void const *argument);
+void can_read_task(void const * argument);
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -69,14 +66,14 @@ void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackTy
 /* USER CODE BEGIN GET_IDLE_TASK_MEMORY */
 static StaticTask_t xIdleTaskTCBBuffer;
 static StackType_t xIdleStack[configMINIMAL_STACK_SIZE];
-
-void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize)
+  
+void vApplicationGetIdleTaskMemory( StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize )
 {
   *ppxIdleTaskTCBBuffer = &xIdleTaskTCBBuffer;
   *ppxIdleTaskStackBuffer = &xIdleStack[0];
   *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
   /* place for user code */
-}
+}                   
 /* USER CODE END GET_IDLE_TASK_MEMORY */
 
 /**
@@ -86,7 +83,7 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
-
+       
   /* USER CODE END Init */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -111,8 +108,8 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-  osThreadDef(ledTask, LED_task, osPriorityNormal, 0, 512);
-  ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
+  osThreadDef(canTask, can_read_task, osPriorityNormal, 0, 512);
+  canTaskHandle = osThreadCreate(osThread(canTask), NULL);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
@@ -129,7 +126,7 @@ void StartDefaultTask(void const * argument)
 {
   /* USER CODE BEGIN StartDefaultTask */
   /* Infinite loop */
-  for (;;)
+  for(;;)
   {
     osDelay(1);
   }
@@ -138,47 +135,17 @@ void StartDefaultTask(void const * argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
-void LED_task(void const *argument)
+void can_read_task(void const * argument)
 {
-  uint8_t ledColor[3] = {10, 0, 0};
-  // NCP5623_init();
-  // i2c_SendByte(0x38);
-  // i2c_SendByte(0x50);
-  // i2c_SendByte(0x38);
-  // i2c_SendByte(0x00);
-  // Device_WriteData(0x38,0x00);
-
-  for (;;)
-  {
-    NCP5623_write_pwm(ledColor);
-    // i2c_Start();
-    // HAL_Delay(1);
-    // i2c_SendByte(0x38);
-    // i2c_SendByte(0x60);
-    // i2c_Stop();
-    // HAL_Delay(1);
-    // i2c_Start();
-    // i2c_SendByte(0x38);
-    // i2c_SendByte(0x80);
-    // HAL_Delay(1);
-    // i2c_Stop();
-    // osDelay(1);
-    // i2c_Start();
-    // i2c_SendByte(0x38);
-    // i2c_SendByte(0x5F);
-    // i2c_Stop();
-    // HAL_I2C_Mem_Write(&hi2c1, NCP5623_DEFAULT_ADDR, 0x40,1,&test, 1, 10);
-    // NCP5623_setColor(255,0,0);
-    // NCP5623_setRed(2);
-    // Device_WriteData(0x38,0x70);
-    // i2c_SendByte(0x38);
-    // osDelay(2);
-    // i2c_SendByte(0x70);
-    osDelay(100);
-    // NCP5623_setColor(0,255,0);
-    osDelay(1);
-    // NCP5623_setColor(0,0,255);
-  }
+	for(;;)
+	{
+//		if(get_status(CAN_RX_STATUS))
+//		{
+			update_generator_data();
+//		}
+		HAL_Delay(100);
+		osDelay(1);
+	}
 }
 /* USER CODE END Application */
 

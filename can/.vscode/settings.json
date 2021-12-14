@@ -1,8 +1,6 @@
 {
     "files.associations": {
         "usart.h": "c",
-        "main.h": "c",
-        "i2c.h": "c",
-        "ncp5623.h": "c"
+        "main.h": "c"
     }
 }
