@@ -72,3 +72,8 @@ void update_generator_data()
 	generator_data.footermagic2 = 0xAA;
 	send_generator();
 }
+
+void get_oil_level()
+{
+	
+}
