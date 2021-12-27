@@ -25,9 +25,10 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
+/* USER CODE BEGIN Includes */
 #include "generator.h"
 #include "status.h"
+#include "tim.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,7 +43,7 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+osThreadId canTaskHandle;
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -50,7 +51,7 @@
 extern uint8_t canRxData[2048];
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
-osThreadId canTaskHandle;
+
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
 void can_read_task(void const * argument);
@@ -135,17 +136,23 @@ void StartDefaultTask(void const * argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
 void can_read_task(void const * argument)
 {
-	for(;;)
-	{
-//		if(get_status(CAN_RX_STATUS))
-//		{
-			update_generator_data();
-//		}
-		HAL_Delay(100);
-		osDelay(1);
-	}
+  int oilPWM = 0;
+  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_3);
+  __HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_3, 1000);
+
+  for (;;)
+  {
+
+    update_generator_data();
+		oilPWM = get_oil_level();
+    __HAL_TIM_SetCompare(&htim2, TIM_CHANNEL_3, oilPWM);
+
+    HAL_Delay(100);
+    osDelay(1);
+  }
 }
 /* USER CODE END Application */
 

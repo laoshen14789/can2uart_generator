@@ -62,7 +62,6 @@ void update_generator_data()
 	{
 		generator_data.mode = 1;
 	}
-	
 
 //	generator_data.output_voltage = endianSwap(cnt*2 * 100, 2);
 //	generator_data.output_current = endianSwap(2 * 100, 2);
@@ -71,4 +70,17 @@ void update_generator_data()
 	generator_data.footermagic1 = 0x55;
 	generator_data.footermagic2 = 0xAA;
 	send_generator();
+	
+}
+
+
+int get_oil_level()
+{
+	uint8_t oilLevel = 0;
+	float FuelPosition = 0;
+	int transOut = 0;
+	oilLevel = generator_info.generator1_s.FuelPosition;
+	FuelPosition = oilLevel/200.0;
+	transOut = 1000+(1000*FuelPosition);
+	return transOut;
 }

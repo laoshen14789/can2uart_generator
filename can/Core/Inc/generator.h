@@ -87,6 +87,7 @@ typedef struct
 
 void send_generator(void);
 void update_generator_data(void);
+int get_oil_level(void);
 
 #endif
 

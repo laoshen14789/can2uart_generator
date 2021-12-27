@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : CAN.c
-  * Description        : This file provides code for the configuration
-  *                      of the CAN instances.
+  * @file    can.c
+  * @brief   This file provides code for the configuration
+  *          of the CAN instances.
   ******************************************************************************
   * @attention
   *
@@ -24,7 +24,7 @@
 #include "status.h"
 #include <string.h>
 #include "generator.h"
-CAN_TxHeaderTypeDef	TxHeader;      //发送
+CAN_TxHeaderTypeDef	TxHeader;      //发�??
 
 uint8_t canRxData[64] = {0};
 generator_info_s generator_info;
@@ -59,6 +59,13 @@ CAN_HandleTypeDef hcan;
 void MX_CAN_Init(void)
 {
 
+  /* USER CODE BEGIN CAN_Init 0 */
+
+  /* USER CODE END CAN_Init 0 */
+
+  /* USER CODE BEGIN CAN_Init 1 */
+
+  /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN1;
   hcan.Init.Prescaler = 3;
   hcan.Init.Mode = CAN_MODE_NORMAL;
@@ -75,7 +82,10 @@ void MX_CAN_Init(void)
   {
     Error_Handler();
   }
+  /* USER CODE BEGIN CAN_Init 2 */
   CAN_Config();
+  /* USER CODE END CAN_Init 2 */
+
 }
 
 void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
@@ -89,11 +99,11 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
   /* USER CODE END CAN1_MspInit 0 */
     /* CAN1 clock enable */
     __HAL_RCC_CAN1_CLK_ENABLE();
-  
+
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**CAN GPIO Configuration    
+    /**CAN GPIO Configuration
     PA11     ------> CAN_RX
-    PA12     ------> CAN_TX 
+    PA12     ------> CAN_TX
     */
     GPIO_InitStruct.Pin = GPIO_PIN_11;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
@@ -124,10 +134,10 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
   /* USER CODE END CAN1_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_CAN1_CLK_DISABLE();
-  
-    /**CAN GPIO Configuration    
+
+    /**CAN GPIO Configuration
     PA11     ------> CAN_RX
-    PA12     ------> CAN_TX 
+    PA12     ------> CAN_TX
     */
     HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11|GPIO_PIN_12);
 
@@ -137,7 +147,7 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
   /* USER CODE END CAN1_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 void CAN_Config(void)
@@ -145,21 +155,21 @@ void CAN_Config(void)
   CAN_FilterTypeDef  sFilterConfig;
   CAN_FilterRegTypeDef IDH = {0};
   CAN_FilterRegTypeDef IDL = {0};
-  /*配置CAN过滤器*/
+  /*配置CAN过滤�?*/
   IDH.Sub.STID = (0 >> 16) & 0xFFFF;		// ??ID?16?
   IDL.Sub.STID = (0 & 0xFFFF);				// ??ID?16?
-  sFilterConfig.FilterBank = 0;                     //过滤器0
+  sFilterConfig.FilterBank = 0;                     //过滤�?0
   sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
   sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
   sFilterConfig.FilterIdHigh         = IDH.value;										// ???????ID????,??????
   sFilterConfig.FilterIdLow          = IDL.value;										// ???????ID????,??????
   sFilterConfig.FilterMaskIdHigh     = IDH.value;										// ???????ID????,??????
   sFilterConfig.FilterMaskIdLow      = IDL.value;										// ???????ID????
-  sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;//过滤器0关联到FIFO0
-  sFilterConfig.FilterActivation = ENABLE;          //激活滤波器0
+  sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;//过滤�?0关联到FIFO0
+  sFilterConfig.FilterActivation = ENABLE;          //�?活滤波器0
   sFilterConfig.SlaveStartFilterBank = 14;
 	
-  //过滤器配置
+  //过滤器配�?
   if (HAL_CAN_ConfigFilter(&hcan, &sFilterConfig) != HAL_OK)
   {
     while(1){}
@@ -171,7 +181,7 @@ void CAN_Config(void)
     while(1){}
   }
 
-  //激活可以RX通知
+  //�?活可以RX通知
   if (HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
   {
     while(1){}
@@ -186,26 +196,26 @@ void CAN_Config(void)
   TxHeader.TransmitGlobalTime = DISABLE;
 }
 
-//can发送一组数据(固定格式:ID为0X12,标准帧,数据帧)	
-//len:数据长度(最大为8)				     
-//msg:数据指针,最大为8个字节.
-//返回值:0,成功;
+//can发�?�一组数�?(固定格式:ID�?0X12,标准�?,数据�?)	
+//len:数据长度(�?大为8)				     
+//msg:数据指针,�?大为8个字�?.
+//返回�?:0,成功;
 //		 其他,失败;
 uint8_t CAN1_Send_Msg(uint8_t* msg,uint8_t len)
 {	
     uint8_t i=0;
 	uint32_t TxMailbox;
 	uint8_t message[8];
-    TxHeader.StdId=0X12;        //标准标识符
-    TxHeader.ExtId=0x12;        //扩展标识符(29位)
-    TxHeader.IDE=CAN_ID_STD;    //使用标准帧
-    TxHeader.RTR=CAN_RTR_DATA;  //数据帧
+    TxHeader.StdId=0X12;        //标准标识�?
+    TxHeader.ExtId=0x12;        //扩展标识�?(29�?)
+    TxHeader.IDE=CAN_ID_STD;    //使用标准�?
+    TxHeader.RTR=CAN_RTR_DATA;  //数据�?
     TxHeader.DLC=len;                
     for(i=0;i<len;i++)
     {
 		message[i]=msg[i];
 	}
-    if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, message, &TxMailbox) != HAL_OK)//发送
+    if(HAL_CAN_AddTxMessage(&hcan, &TxHeader, message, &TxMailbox) != HAL_OK)//发�??
 	{
 		return 1;
 	}
@@ -213,10 +223,10 @@ uint8_t CAN1_Send_Msg(uint8_t* msg,uint8_t len)
     return 0;
 }
 
-//can口接收数据查询
-//buf:数据缓存区;	 
-//返回值:0,无数据被收到;
-//		 其他,接收的数据长度;
+//can口接收数据查�?
+//buf:数据缓存�?;	 
+//返回�?:0,无数据被收到;
+//		 其他,接收的数据长�?;
 uint8_t CAN1_Receive_Msg(uint8_t *buf,CAN_HandleTypeDef * canHandle)
 {
  	uint32_t i;
